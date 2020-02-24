@@ -1,0 +1,137 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  text-decoration: none;
+}
+@keyframes rotateG {
+  from {
+    transform: rotate(0);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+#map {
+  height: 100%;
+}
+html {
+  height: 100%;
+}
+body {
+  height: calc(100% - 60px);
+}
+.header {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  height: 60px;
+  box-shadow: inset -6px -49px 98px -61px rgba(64, 71, 219, 0.47);
+}
+.logo {
+  display: block;
+}
+.logo__p {
+  font-size: 26px;
+  color: royalblue;
+  cursor: pointer;
+}
+.logo__p:hover .logo__span {
+  animation: rotateG 1s ;
+}
+.logo__span {
+  color: royalblue;
+  display: inline-block;
+}
+.modalWindow {
+  color: royalblue;
+  background-color: #fff;
+  transform: translate(-50%, -50%);
+  position: fixed;
+  left: 50%;
+  height: 100px;
+  width: 300px;
+  top: 50%;
+  border-radius: 5px;
+}
+.modalWindow__header {
+  height: 30px;
+  line-height: 30px;
+  padding: 0 10px;
+  color: royalblue;
+  text-align: center;
+  box-shadow: inset -6px -49px 98px -61px rgba(64, 71, 219, 0.47);
+}
+.modalWindow_buttons {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  height: 70px;
+}
+.button {
+  display: inline-block;
+  width: 60px;
+  height: 40px;
+  border-radius: 5px;
+  border: 1px solid #5c97e6;
+  color: #5c97e6;
+  cursor: pointer;
+  transition: 0.2s;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0);
+}
+.button:hover {
+  position: relative;
+  bottom: 2px ;
+  border: 1px solid royalblue;
+  color: royalblue;
+}
+.markerForm {
+  color: royalblue;
+  background-color: #fff;
+  transform: translate(-50%, -50%);
+  position: fixed;
+  left: 50%;
+  height: 305px;
+  width: 300px;
+  top: 50%;
+  border-radius: 5px;
+}
+.markerForm__header {
+  height: 30px;
+  line-height: 30px;
+  padding: 0 10px;
+  color: royalblue;
+  text-align: center;
+  box-shadow: inset -6px -49px 98px -61px rgba(64, 71, 219, 0.47);
+}
+.markerForm__form {
+  padding: 10px;
+}
+.markerForm__form label {
+  display: flex;
+  margin-bottom: 10px;
+  align-items: flex-end;
+}
+.markerForm__form input {
+  color: royalblue;
+  border: none;
+  margin-left: 10px;
+  width: 100%;
+  border-bottom: 1px solid royalblue;
+}
+.markerForm__form input:invalid {
+  color: red;
+}
+.markerForm__form input::placeholder {
+  color: rgba(94, 114, 175, 0.555);
+}
+.markerForm__form_label {
+  white-space: nowrap;
+}
+.markerForm_buttons {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  height: 70px;
+}

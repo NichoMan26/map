@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.css">
+    <title>Map</title>
+</head>
+<body>
+    <header class="header">
+        <a href='/' class="logo">
+            <p class="logo__p">
+                <span class="logo__span">G</span>-place
+            </p>
+        </a>
+    </header>
+    <div id="map"></div>
+
+<script>
+    let firstInit = true;
+    let store = {
+        idCount:3,
+        markers:[
+        {
+                id:1,
+                name:'House',
+                location:{lat:61.030911,lng:28.545966},
+                about:'I live here',
+                workTme:{
+                    from: 0,
+                    to:24
+                },
+                myFavorite: true,
+                addOnMap:false
+
+            },{
+                id:2,
+                name:'Work',
+                location:{lat:60.16627273324537,lng:24.944025390624986},
+                about:'I will work here',
+                workTme:{
+                    from: 8,
+                    to:16
+                },
+                myFavorite: true,
+                addOnMap:false
+                
+            }
+        ],
+        tags:[
+            {tagId:1,tagName:'house', markersWhoHasTeg:[1,2]},
+            {tagId:2,tagName:'work', markersWhoHasTeg:[2]},
+        ],
+        myFavorits:[1],
+        getIdCount(){
+            this.setIdCount()
+            return this.idCount
+        },
+        setIdCount(){
+            this.idCount = ++this.idCount
+        }
+
+    }
+    
+    function addStoreInLocalStore(){
+        localStorage.setItem('mapBD', JSON.stringify({
+            idCount:store.idCount,
+            markers:store.markers,
+            myFavorits:store.myFavorits
+        }))
+
+    }
+    
+    function checkLocalStorage(){ //Check have we data in localtorage about our markers
+            let json = localStorage.getItem('mapBD')
+            if(json !== null) {
+                console.log('store was updatet from localStorage')
+                let localStore = JSON.parse(json)
+                store.idCount = localStore.idCount;
+                store.markers = localStore.markers;
+                store.myFavorits = localStore.myFavorits;
+            } else {
+                console.log('create localStorage')
+                addStoreInLocalStore()
+            }
+        }
+    
+    function addMarkerInStore(newMarker){
+        store.markers.push(newMarker)
+        updateLocalStorage()
+    }
+
+    function removeMarkerFromStore(marker){
+        store.markers.map((element, idx) => {
+            if(element.id === marker.id){
+                store.markers.splice(idx, 1)
+            }
+        });
+        updateLocalStorage()
+    }
+    
+    function removeMarkerFromMap(marker){
+        window['marker' + marker.id].setMap(null)
+    }
+    
+    function updateLocalStorage() {
+        localStorage.setItem('mapBD', JSON.stringify(store))
+    }
+    
+    function createModal(latLng, map){//Create modal window when we click on "Ok'" in window
+        if(document.querySelector('.modalWindow') === null && document.querySelector('.markerForm') === null){
+        let modalWindow = document.createElement('div')
+        modalWindow.classList.add('modalWindow')
+        modalWindow.innerHTML=`<div class='modalWindow__header'>Do you wont to create a new marker?</div>
+        
+        <div class='modalWindow__body'>
+            <div class='modalWindow_buttons'>
+                <button class="button" id='modal__button_ok'>Ok</button>
+                <button class="button" id='modal__button_cancel'>Cancel</button>
+            </div>
+        </div>`
+        let mapContainer = document.getElementById('map')
+        mapContainer.appendChild(modalWindow)
+        let buttonOk = document.getElementById('modal__button_ok')
+        buttonOk.addEventListener('click', () => {
+            removeModal()
+            createMarkerForm(latLng, map)
+            
+        })
+        let buttonCancel = document.getElementById('modal__button_cancel')
+        buttonCancel.addEventListener('click', removeModal)
+        };
+    }
+
+    function createNewMarker(latLng){
+            let name = document.getElementById('markerForm_name').value
+            let from = document.getElementById('markerForm_timeFrom').value
+            let to = document.getElementById('markerForm_timeTo').value
+            let desc = document.getElementById('markerForm_desc').value
+            let isFavorite = document.getElementById('markerForm_isFavorite').checked
+            let lat = document.getElementById('markerForm_lat').value
+            console.log('lat: ', lat);
+            let lng = document.getElementById('markerForm_lng').value
+            console.log('lng: ', lng);
+        let newMarker = {
+            id:store.getIdCount(),
+            name:name,
+            location:{lat:+lat,lng:+lng},
+            about:desc,
+            workTme:{
+                from: from,
+                to:to
+            },
+            myFavorite: isFavorite,
+            addOnMap:false
+
+        }
+        addMarkerInStore(newMarker)
+    }
+    
+    function updateMarker(marker){
+            let name = document.getElementById('markerForm_name').value
+            let from = document.getElementById('markerForm_timeFrom').value
+            let to = document.getElementById('markerForm_timeTo').value
+            let desc = document.getElementById('markerForm_desc').value
+            let isFavorite = document.getElementById('markerForm_isFavorite').checked
+            let lat = document.getElementById('markerForm_lat').value
+            let lng = document.getElementById('markerForm_lng').value
+        let newMarker = {
+            id:marker.id,
+            name:name,
+            location:{lat:+lat,lng:+lng},
+            about:desc,
+            workTme:{
+                from: from,
+                to:to
+            },
+            myFavorite: isFavorite,
+            addOnMap:false
+
+        }
+
+        removeMarkerFromStore(marker);
+        addMarkerInStore(newMarker)
+    }
+    
+    function createMarkerForm(latLng, map, marker){
+        if (document.querySelector('.markerForm') === null){
+            let markerForm = document.createElement('div')
+            markerForm.classList.add('markerForm')
+            
+            if(marker !== undefined){
+                    markerForm.innerHTML=`
+                <div class='markerForm__header'>Edit marker</div>
+                <form id='markerForm' class="markerForm__form">
+                    <label><span class='markerForm__form_label'>Name: </span><input value='${marker.name}' required  id='markerForm_name' name='name' type="text"></label>
+                    <label><span class='markerForm__form_label'>Description: </span><input value='${marker.about}' name='desc' placeholder='enter marker description' id='markerForm_desc' type="text"></label>
+                    <label><span class='markerForm__form_label'>Work time (from): </span><input value='${marker.workTme.from}' pattern="[0-9]{1,2}" placeholder='0 - 24' id='markerForm_timeFrom' name='timeFrom' type="text"></label>
+                    <label><span class='markerForm__form_label'>Work time (to): </span><input value='${marker.workTme.to}' pattern="[0-9]{1,2}" placeholder='0 - 24' id='markerForm_timeTo' name='timeTo' type="text"></label>
+                    <label><span class='markerForm__form_label'>Add to favorite: </span><input ${marker.myFavorite?`checked`:null} id='markerForm_isFavorite' name='isFavorite' type="checkbox"></label>
+                    <label><span class='markerForm__form_label'>Coordinate X: </span><input id='markerForm_lat' value=${marker.location.lat} pattern="-?[0-9]{1,3}\.[0-9]{1,20}?" name='lat' type="text"></label>
+                    <label><span class='markerForm__form_label'>Coordinate Y: </span><input id='markerForm_lng' value=${marker.location.lng} pattern="-?[0-9]{1,3}\.[0-9]{1,20}?" name='lng' type="text"></label>
+                    <div class='markerForm_buttons'>
+                        <button class="button" id='markerForm__button_ok'>Ok</button>
+                        <button class="button" id='markerForm__button_cancel'>Cancel</button>
+                        <button class="button" id='markerForm__button_delete'>Delete</button>
+                    </div>
+                </form>`
+                markerForm.addEventListener('submit',(e) => {
+                    e.preventDefault()
+                    removeMarkerFromMap(marker)
+                    updateMarker(marker)
+                    initMarkers(map)
+                    removeMarkerForm()
+                })
+
+            } else {
+                console.log('create');
+                markerForm.innerHTML=`
+            <div class='markerForm__header'>New marker</div>
+            <form id='markerForm' class="markerForm__form">
+                <label><span class='markerForm__form_label'>Name: </span><input id='markerForm_name' placeholder='enter marker name' required  name='name' type="text"></label>
+                <label><span class='markerForm__form_label'>Description: </span><input name='desc' id='markerForm_desc' placeholder='enter marker description' type="text"></label>
+                <label><span class='markerForm__form_label'>Work time (from): </span><input id='markerForm_timeFrom' pattern="[0-9]{1,2}" placeholder='0 - 24' name='timeFrom' type="text"></label>
+                <label><span class='markerForm__form_label'>Work time (to): </span><input id='markerForm_timeTo' pattern="[0-9]{1,2}" placeholder='0 - 24' name='timeTo' type="text"></label>
+                <label><span class='markerForm__form_label'>Add to favorite: </span><input id='markerForm_isFavorite' name='isFavorite' type="checkbox"></label>
+                <label><span class='markerForm__form_label'>Coordinate X: </span><input id='markerForm_lat' value=${latLng.lat()} pattern="-?[0-9]{1,3}\.[0-9]{1,20}?" name='lat' type="text"></label>
+                <label><span class='markerForm__form_label'>Coordinate Y: </span><input id='markerForm_lng' value=${latLng.lng()} pattern="-?[0-9]{1,3}\.[0-9]{1,20}?" name='lng' type="text"></label>
+                <label><span class='markerForm__form_label'>Coordinate Y: </span><input id='markerForm_lng' value=${latLng.lng()} pattern="-?[0-9]{1,3}\.[0-9]{1,20}?" name='lng' type="text"></label>
+                <div class='markerForm_buttons'>
+                    <button class="button" id='markerForm__button_ok'>Ok</button>
+                    <button class="button" id='markerForm__button_cancel'>Cancel</button>
+                </div>
+            </form>`
+            markerForm.addEventListener('submit',(e) => {
+                
+                e.preventDefault()
+                createNewMarker(latLng)
+                initMarkers(map)
+                removeMarkerForm()
+            })
+            
+            }
+            let mapContainer = document.getElementById('map')
+            mapContainer.appendChild(markerForm)
+            let buttonCancel = document.getElementById('markerForm__button_cancel')
+            console.log('buttonCancel: ', buttonCancel);
+            buttonCancel.addEventListener('click', (e) => { // click on cancel
+                e.preventDefault()
+                removeMarkerForm()
+            })
+            if(marker !== undefined){
+                let buttonDelete = document.getElementById('markerForm__button_delete')
+                buttonDelete.addEventListener('click', (e) => {
+                    console.log('delete');
+                    e.preventDefault()
+                    removeMarkerFromMap(marker)
+                    removeMarkerFromStore(marker)
+                    removeMarkerForm()
+                    initMarkers(map)
+                })
+            }
+           
+        }
+    }
+
+    function removeMarkerForm(){
+        document.querySelector('.markerForm').remove()
+    }
+
+    function removeModal(){
+        document.querySelector('.modalWindow').remove()
+    }
+ 
+    function placeMarkerAndPanTo(marker, map) {
+        window['marker' + marker.id] = new google.maps.Marker({
+            position: {lat:marker.location.lat,lng:marker.location.lng},
+            title: marker.name,
+            map: map,
+            icon: marker.myFavorite ? '../assets/img/icon/favorite_marker.png' : '../assets/img/icon/marker.png',
+            markerId:marker.id
+        });
+        google.maps.event.addListener(window['marker' + marker.id], 'click', function(e) {
+            let currentMarker;
+            store.markers.forEach((item) => {
+                if(item.id === this.markerId){
+                    currentMarker = item
+                }
+            })
+            console.log('currentMarker: ', currentMarker);
+            createMarkerForm(null, map, currentMarker)
+        //infowindow2.open(map, companyMarker2);
+        
+        });
+    }
+    
+    function initMarkers(map) {
+        if(store.markers.length !== 0){
+            store.markers.forEach((marker) => {
+                if(firstInit || !marker.addOnMap ){
+                    placeMarkerAndPanTo(marker, map)
+                    marker.addOnMap = true
+                }
+            })
+        }
+        firstInit = false
+    }   
+    
+    function initMap(){
+        let  map = new google.maps.Map(document.getElementById('map'), {
+        center: {lat: 60.684, lng: 25.768},
+        zoom: 7
+        });
+        initMarkers(map)
+
+        map.addListener('click', function(e) {
+            createModal(e.latLng, map);
+    })
+    
+    }
+
+    
+checkLocalStorage()
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDgaFycpao1rB1Ef09AaY03hW3BRwc0oCg&callback=initMap" async defer></script>
+
+</body>
+</html>
