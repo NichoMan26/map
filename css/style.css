@@ -3,6 +3,7 @@
   margin: 0;
   box-sizing: border-box;
   text-decoration: none;
+  list-style: none;
 }
 @keyframes rotateG {
   from {
@@ -24,6 +25,7 @@ body {
 .header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   padding: 10px;
   height: 60px;
   box-shadow: inset -6px -49px 98px -61px rgba(64, 71, 219, 0.47);
@@ -42,6 +44,23 @@ body {
 .logo__span {
   color: royalblue;
   display: inline-block;
+}
+.sortForm {
+  display: flex;
+  align-items: center;
+}
+.sortForm__label {
+  display: flex;
+  align-items: center;
+  margin-right: 50px;
+}
+.sortForm__text {
+  margin-right: 10px;
+  color: royalblue;
+}
+.sortForm__select {
+  border: 1px solid royalblue;
+  color: royalblue;
 }
 .modalWindow {
   color: royalblue;
@@ -78,10 +97,10 @@ body {
   cursor: pointer;
   transition: 0.2s;
   bottom: 0;
+  position: relative;
   background-color: rgba(255, 255, 255, 0);
 }
 .button:hover {
-  position: relative;
   bottom: 2px ;
   border: 1px solid royalblue;
   color: royalblue;
@@ -92,7 +111,6 @@ body {
   transform: translate(-50%, -50%);
   position: fixed;
   left: 50%;
-  height: 305px;
   width: 300px;
   top: 50%;
   border-radius: 5px;
@@ -134,4 +152,59 @@ body {
   justify-content: space-evenly;
   align-items: center;
   height: 70px;
+}
+.tags__button {
+  padding: 0 5px;
+  border: 1px solid #5c97e6;
+  border-radius: 5px;
+  color: #5c97e6;
+  margin-left: 10px;
+  position: relative;
+  bottom: 0px;
+  transition: 0.2s;
+  cursor: pointer;
+}
+.tags__button:hover {
+  bottom: 2px;
+}
+.tags__area {
+  min-height: 26px;
+  padding: 2px 2px 00;
+  display: flex;
+  flex-wrap: wrap;
+  border-radius: 5px;
+  border: 1px solid royalblue;
+  color: royalblue;
+}
+.tag {
+  border: 1px solid royalblue;
+  padding: 0 2px;
+  max-height: 20px;
+  border-radius: 5px;
+  margin-right: 2px;
+  margin-bottom: 2px;
+}
+.cross {
+  width: 10px;
+  display: inline-block;
+  height: 10px;
+  border-radius: 10px;
+  position: relative;
+  cursor: pointer;
+}
+.cross:hover .cross__line {
+  background-color: #2949aa;
+}
+.cross__line {
+  position: absolute;
+  display: inline-block;
+  left: 50%;
+  top: 50% ;
+  width: 12px;
+  height: 2px;
+  background-color: royalblue;
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+.cross__line:nth-child(2) {
+  transform: translate(-50%, -50%) rotate(135deg);
 }
